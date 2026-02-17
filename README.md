@@ -30,6 +30,15 @@ Then start frontend from `/Users/swethareddy/projects/neighborhood-library-front
 npm run dev
 ```
 
+## Run Frontend Tests
+
+From frontend repo:
+
+```bash
+cd /Users/swethareddy/projects/neighborhood-library-frontend
+npm test -- --runInBand
+```
+
 ## Features
 
 - Create and list books
