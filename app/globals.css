@@ -52,6 +52,23 @@ h1, h2 {
   margin-top: 16px;
 }
 
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.tabButton {
+  background: #d9ccb6;
+  color: var(--ink);
+}
+
+.tabButton.active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .panel {
   background: var(--paper);
   border: 1px solid var(--border);
@@ -94,6 +111,14 @@ button:hover {
   border-radius: 10px;
   padding: 10px;
   background: white;
+}
+
+.actionsRow {
+  margin-top: 8px;
+}
+
+.panelSubTitle {
+  margin-top: 16px;
 }
 
 .muted {

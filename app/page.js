@@ -13,11 +13,17 @@ import {
   updateBook,
   updateMember,
 } from '../lib/api';
+import BooksTab from '../components/BooksTab';
+import CirculationTab from '../components/CirculationTab';
+import MemberBorrowedTab from '../components/MemberBorrowedTab';
+import MembersTab from '../components/MembersTab';
 
 const emptyBook = { title: '', author: '', isbn: '', total_copies: 1 };
 const emptyMember = { name: '', email: '', phone: '' };
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState('books');
+
   const [books, setBooks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loans, setLoans] = useState([]);
@@ -205,136 +211,92 @@ export default function HomePage() {
         {error ? <p className="badge warn">{error}</p> : null}
       </section>
 
-      <section className="grid">
-        <div className="panel">
-          <h2>Add Book</h2>
-          <form onSubmit={handleBookSubmit}>
-            <input required placeholder="Title" value={bookForm.title} onChange={(e) => setBookForm({ ...bookForm, title: e.target.value })} />
-            <input required placeholder="Author" value={bookForm.author} onChange={(e) => setBookForm({ ...bookForm, author: e.target.value })} />
-            <input required placeholder="ISBN" value={bookForm.isbn} onChange={(e) => setBookForm({ ...bookForm, isbn: e.target.value })} />
-            <input required type="number" min="1" placeholder="Total Copies" value={bookForm.total_copies} onChange={(e) => setBookForm({ ...bookForm, total_copies: e.target.value })} />
-            <button disabled={loading} type="submit">Create Book</button>
-          </form>
-          <div className="list">
-            {books.map((book) => (
-              <article className="item" key={book.id}>
-                {editingBookId === book.id ? (
-                  <form onSubmit={saveBookEdit}>
-                    <input required value={editingBookForm.title} onChange={(e) => setEditingBookForm({ ...editingBookForm, title: e.target.value })} />
-                    <input required value={editingBookForm.author} onChange={(e) => setEditingBookForm({ ...editingBookForm, author: e.target.value })} />
-                    <input required value={editingBookForm.isbn} onChange={(e) => setEditingBookForm({ ...editingBookForm, isbn: e.target.value })} />
-                    <input required type="number" min="1" value={editingBookForm.total_copies} onChange={(e) => setEditingBookForm({ ...editingBookForm, total_copies: e.target.value })} />
-                    <button disabled={loading} type="submit">Save</button>
-                    <button disabled={loading} type="button" onClick={() => setEditingBookId(null)}>Cancel</button>
-                  </form>
-                ) : (
-                  <>
-                    <strong>{book.title}</strong>
-                    <div className="muted">{book.author}</div>
-                    <div className="muted">ISBN: {book.isbn}</div>
-                    <span className="badge">Available: {book.available_copies}/{book.total_copies}</span>
-                    <div style={{ marginTop: 8 }}>
-                      <button disabled={loading} type="button" onClick={() => startBookEdit(book)}>Edit Book</button>
-                    </div>
-                  </>
-                )}
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="panel">
-          <h2>Add Member</h2>
-          <form onSubmit={handleMemberSubmit}>
-            <input required placeholder="Name" value={memberForm.name} onChange={(e) => setMemberForm({ ...memberForm, name: e.target.value })} />
-            <input required type="email" placeholder="Email" value={memberForm.email} onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })} />
-            <input placeholder="Phone" value={memberForm.phone} onChange={(e) => setMemberForm({ ...memberForm, phone: e.target.value })} />
-            <button disabled={loading} type="submit">Create Member</button>
-          </form>
-
-          <div className="list">
-            {members.map((member) => (
-              <article className="item" key={member.id}>
-                {editingMemberId === member.id ? (
-                  <form onSubmit={saveMemberEdit}>
-                    <input required value={editingMemberForm.name} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, name: e.target.value })} />
-                    <input required type="email" value={editingMemberForm.email} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, email: e.target.value })} />
-                    <input value={editingMemberForm.phone} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, phone: e.target.value })} />
-                    <button disabled={loading} type="submit">Save</button>
-                    <button disabled={loading} type="button" onClick={() => setEditingMemberId(null)}>Cancel</button>
-                  </form>
-                ) : (
-                  <>
-                    <strong>{member.name}</strong>
-                    <div className="muted">{member.email}</div>
-                    <div className="muted">{member.phone || 'No phone on file'}</div>
-                    <div style={{ marginTop: 8 }}>
-                      <button disabled={loading} type="button" onClick={() => startMemberEdit(member)}>Edit Member</button>
-                    </div>
-                  </>
-                )}
-              </article>
-            ))}
-          </div>
-        </div>
+      <section className="tabs" aria-label="Library dashboard tabs">
+        <button
+          className={`tabButton ${activeTab === 'books' ? 'active' : ''}`}
+          type="button"
+          onClick={() => setActiveTab('books')}
+        >
+          Books
+        </button>
+        <button
+          className={`tabButton ${activeTab === 'members' ? 'active' : ''}`}
+          type="button"
+          onClick={() => setActiveTab('members')}
+        >
+          Members
+        </button>
+        <button
+          className={`tabButton ${activeTab === 'circulation' ? 'active' : ''}`}
+          type="button"
+          onClick={() => setActiveTab('circulation')}
+        >
+          Circulation
+        </button>
+        <button
+          className={`tabButton ${activeTab === 'borrowed' ? 'active' : ''}`}
+          type="button"
+          onClick={() => setActiveTab('borrowed')}
+        >
+          Borrowed Books
+        </button>
       </section>
 
-      <section className="grid">
-        <div className="panel">
-          <h2>Borrow Book</h2>
-          <form onSubmit={handleBorrowSubmit}>
-            <select required value={borrowForm.member_id} onChange={(e) => setBorrowForm({ ...borrowForm, member_id: e.target.value })}>
-              <option value="">Select member</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>{member.name}</option>
-              ))}
-            </select>
-            <select required value={borrowForm.book_id} onChange={(e) => setBorrowForm({ ...borrowForm, book_id: e.target.value })}>
-              <option value="">Select book</option>
-              {books.map((book) => (
-                <option key={book.id} value={book.id}>{book.title} ({book.available_copies} available)</option>
-              ))}
-            </select>
-            <button disabled={loading} type="submit">Borrow</button>
-          </form>
+      {activeTab === 'books' ? (
+        <BooksTab
+          books={books}
+          loading={loading}
+          bookForm={bookForm}
+          setBookForm={setBookForm}
+          handleBookSubmit={handleBookSubmit}
+          editingBookId={editingBookId}
+          editingBookForm={editingBookForm}
+          setEditingBookForm={setEditingBookForm}
+          saveBookEdit={saveBookEdit}
+          startBookEdit={startBookEdit}
+          cancelBookEdit={() => setEditingBookId(null)}
+        />
+      ) : null}
 
-          <h2 style={{ marginTop: 16 }}>Active Loans</h2>
-          <div className="list">
-            {loans.map((loan) => (
-              <article className="item" key={loan.id}>
-                <div>Loan #{loan.id}</div>
-                <div className="muted">Member ID: {loan.member_id}</div>
-                <div className="muted">Book ID: {loan.book_id}</div>
-                <div className="muted">Due: {loan.due_date}</div>
-                <button disabled={loading} onClick={() => handleReturn(loan.id)} type="button">Return Book</button>
-              </article>
-            ))}
-          </div>
-        </div>
+      {activeTab === 'members' ? (
+        <MembersTab
+          members={members}
+          loading={loading}
+          memberForm={memberForm}
+          setMemberForm={setMemberForm}
+          handleMemberSubmit={handleMemberSubmit}
+          editingMemberId={editingMemberId}
+          editingMemberForm={editingMemberForm}
+          setEditingMemberForm={setEditingMemberForm}
+          saveMemberEdit={saveMemberEdit}
+          startMemberEdit={startMemberEdit}
+          cancelMemberEdit={() => setEditingMemberId(null)}
+        />
+      ) : null}
 
-        <div className="panel">
-          <h2>Member Borrowed Books</h2>
-          <form onSubmit={handleMemberLoanQuery}>
-            <select value={selectedMemberForLoans} onChange={(e) => setSelectedMemberForLoans(e.target.value)}>
-              <option value="">Select member</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>{member.name}</option>
-              ))}
-            </select>
-            <button disabled={loading} type="submit">Load Borrowed Books</button>
-          </form>
-          <div className="list">
-            {memberLoans.map((loan) => (
-              <article className="item" key={loan.loan_id}>
-                <strong>{loan.title}</strong>
-                <div className="muted">{loan.author}</div>
-                <div className="muted">Due: {loan.due_date}</div>
-                <span className={`badge ${loan.is_overdue ? 'warn' : ''}`}>{loan.is_overdue ? 'Overdue' : 'On time'}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      {activeTab === 'circulation' ? (
+        <CirculationTab
+          books={books}
+          members={members}
+          loans={loans}
+          loading={loading}
+          borrowForm={borrowForm}
+          setBorrowForm={setBorrowForm}
+          handleBorrowSubmit={handleBorrowSubmit}
+          handleReturn={handleReturn}
+        />
+      ) : null}
+
+      {activeTab === 'borrowed' ? (
+        <MemberBorrowedTab
+          members={members}
+          memberLoans={memberLoans}
+          loading={loading}
+          selectedMemberForLoans={selectedMemberForLoans}
+          setSelectedMemberForLoans={setSelectedMemberForLoans}
+          handleMemberLoanQuery={handleMemberLoanQuery}
+        />
+      ) : null}
 
       {!hasData ? <p className="muted">No data yet. Add books and members to start lending.</p> : null}
     </main>
