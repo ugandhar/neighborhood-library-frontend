@@ -10,6 +10,8 @@ import {
   fetchMemberBorrowedBooks,
   fetchMembers,
   returnBook,
+  updateBook,
+  updateMember,
 } from '../lib/api';
 
 const emptyBook = { title: '', author: '', isbn: '', total_copies: 1 };
@@ -25,6 +27,11 @@ export default function HomePage() {
   const [bookForm, setBookForm] = useState(emptyBook);
   const [memberForm, setMemberForm] = useState(emptyMember);
   const [borrowForm, setBorrowForm] = useState({ member_id: '', book_id: '' });
+
+  const [editingBookId, setEditingBookId] = useState(null);
+  const [editingBookForm, setEditingBookForm] = useState(emptyBook);
+  const [editingMemberId, setEditingMemberId] = useState(null);
+  const [editingMemberForm, setEditingMemberForm] = useState(emptyMember);
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -128,6 +135,68 @@ export default function HomePage() {
     }
   }
 
+  function startBookEdit(book) {
+    setEditingBookId(book.id);
+    setEditingBookForm({
+      title: book.title,
+      author: book.author,
+      isbn: book.isbn,
+      total_copies: book.total_copies,
+    });
+  }
+
+  async function saveBookEdit(event) {
+    event.preventDefault();
+    if (!editingBookId) {
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      await updateBook(editingBookId, {
+        ...editingBookForm,
+        total_copies: Number(editingBookForm.total_copies),
+      });
+      setEditingBookId(null);
+      setEditingBookForm(emptyBook);
+      await loadAll();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function startMemberEdit(member) {
+    setEditingMemberId(member.id);
+    setEditingMemberForm({
+      name: member.name,
+      email: member.email,
+      phone: member.phone || '',
+    });
+  }
+
+  async function saveMemberEdit(event) {
+    event.preventDefault();
+    if (!editingMemberId) {
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      await updateMember(editingMemberId, editingMemberForm);
+      setEditingMemberId(null);
+      setEditingMemberForm(emptyMember);
+      await loadAll();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main>
       <section className="hero">
@@ -149,10 +218,26 @@ export default function HomePage() {
           <div className="list">
             {books.map((book) => (
               <article className="item" key={book.id}>
-                <strong>{book.title}</strong>
-                <div className="muted">{book.author}</div>
-                <div className="muted">ISBN: {book.isbn}</div>
-                <span className="badge">Available: {book.available_copies}/{book.total_copies}</span>
+                {editingBookId === book.id ? (
+                  <form onSubmit={saveBookEdit}>
+                    <input required value={editingBookForm.title} onChange={(e) => setEditingBookForm({ ...editingBookForm, title: e.target.value })} />
+                    <input required value={editingBookForm.author} onChange={(e) => setEditingBookForm({ ...editingBookForm, author: e.target.value })} />
+                    <input required value={editingBookForm.isbn} onChange={(e) => setEditingBookForm({ ...editingBookForm, isbn: e.target.value })} />
+                    <input required type="number" min="1" value={editingBookForm.total_copies} onChange={(e) => setEditingBookForm({ ...editingBookForm, total_copies: e.target.value })} />
+                    <button disabled={loading} type="submit">Save</button>
+                    <button disabled={loading} type="button" onClick={() => setEditingBookId(null)}>Cancel</button>
+                  </form>
+                ) : (
+                  <>
+                    <strong>{book.title}</strong>
+                    <div className="muted">{book.author}</div>
+                    <div className="muted">ISBN: {book.isbn}</div>
+                    <span className="badge">Available: {book.available_copies}/{book.total_copies}</span>
+                    <div style={{ marginTop: 8 }}>
+                      <button disabled={loading} type="button" onClick={() => startBookEdit(book)}>Edit Book</button>
+                    </div>
+                  </>
+                )}
               </article>
             ))}
           </div>
@@ -170,9 +255,24 @@ export default function HomePage() {
           <div className="list">
             {members.map((member) => (
               <article className="item" key={member.id}>
-                <strong>{member.name}</strong>
-                <div className="muted">{member.email}</div>
-                <div className="muted">{member.phone || 'No phone on file'}</div>
+                {editingMemberId === member.id ? (
+                  <form onSubmit={saveMemberEdit}>
+                    <input required value={editingMemberForm.name} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, name: e.target.value })} />
+                    <input required type="email" value={editingMemberForm.email} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, email: e.target.value })} />
+                    <input value={editingMemberForm.phone} onChange={(e) => setEditingMemberForm({ ...editingMemberForm, phone: e.target.value })} />
+                    <button disabled={loading} type="submit">Save</button>
+                    <button disabled={loading} type="button" onClick={() => setEditingMemberId(null)}>Cancel</button>
+                  </form>
+                ) : (
+                  <>
+                    <strong>{member.name}</strong>
+                    <div className="muted">{member.email}</div>
+                    <div className="muted">{member.phone || 'No phone on file'}</div>
+                    <div style={{ marginTop: 8 }}>
+                      <button disabled={loading} type="button" onClick={() => startMemberEdit(member)}>Edit Member</button>
+                    </div>
+                  </>
+                )}
               </article>
             ))}
           </div>
