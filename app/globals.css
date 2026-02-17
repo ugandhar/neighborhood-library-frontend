@@ -1,0 +1,115 @@
+:root {
+  --bg: #f4efe6;
+  --paper: #fffaf2;
+  --ink: #2c241b;
+  --muted: #6b6257;
+  --accent: #1f6f5f;
+  --accent-2: #c27a28;
+  --border: #d9ccb6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 20% 10%, #f8f2e7, transparent 30%),
+    radial-gradient(circle at 80% 20%, #eadcc4, transparent 35%),
+    var(--bg);
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+h1, h2 {
+  margin: 0;
+}
+
+.hero {
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(44, 36, 27, 0.08);
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+form {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+input, button, select {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  font: inherit;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  filter: brightness(0.95);
+}
+
+.list {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: white;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  background: #d9efe9;
+  color: #154c40;
+}
+
+.badge.warn {
+  background: #f8ddbf;
+  color: #6a3b00;
+}
