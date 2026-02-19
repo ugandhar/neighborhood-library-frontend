@@ -113,6 +113,11 @@ button:hover {
   background: white;
 }
 
+.overdueItem {
+  border-color: #d28737;
+  background: #fff4e5;
+}
+
 .actionsRow {
   margin-top: 8px;
 }
