@@ -28,6 +28,7 @@ export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loans, setLoans] = useState([]);
+  const [allLoans, setAllLoans] = useState([]);
   const [overdueLoans, setOverdueLoans] = useState([]);
   const [memberLoans, setMemberLoans] = useState([]);
   const [selectedMemberForLoans, setSelectedMemberForLoans] = useState('');
@@ -45,20 +46,27 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
 
   const hasData = useMemo(
-    () => books.length > 0 || members.length > 0 || loans.length > 0 || overdueLoans.length > 0,
-    [books, members, loans, overdueLoans]
+    () =>
+      books.length > 0 ||
+      members.length > 0 ||
+      loans.length > 0 ||
+      allLoans.length > 0 ||
+      overdueLoans.length > 0,
+    [books, members, loans, allLoans, overdueLoans]
   );
 
   async function loadAll() {
-    const [bookData, memberData, loanData, overdueLoanData] = await Promise.all([
+    const [bookData, memberData, activeLoanData, allLoanData, overdueLoanData] = await Promise.all([
       fetchBooks(),
       fetchMembers(),
       fetchLoans(true),
+      fetchLoans(false),
       fetchOverdueLoans(),
     ]);
     setBooks(bookData);
     setMembers(memberData);
-    setLoans(loanData);
+    setLoans(activeLoanData);
+    setAllLoans(allLoanData);
     setOverdueLoans(overdueLoanData);
   }
 
@@ -283,6 +291,7 @@ export default function HomePage() {
           books={books}
           members={members}
           loans={loans}
+          allLoans={allLoans}
           overdueLoans={overdueLoans}
           loading={loading}
           borrowForm={borrowForm}

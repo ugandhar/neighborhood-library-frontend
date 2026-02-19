@@ -39,7 +39,12 @@ beforeEach(() => {
   fetchMembers.mockResolvedValue([
     { id: 1, name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890' },
   ]);
-  fetchLoans.mockResolvedValue([]);
+  fetchLoans.mockImplementation((activeOnly = true) => {
+    if (activeOnly) {
+      return Promise.resolve([]);
+    }
+    return Promise.resolve([]);
+  });
   fetchOverdueLoans.mockResolvedValue([]);
 
   createBook.mockResolvedValue({ id: 2 });
@@ -117,7 +122,7 @@ test('displays overdue loans in circulation tab', async () => {
   render(<HomePage />);
   await user.click(await screen.findByRole('button', { name: 'Circulation' }));
 
-  expect(await screen.findByText('Overdue Loans')).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Overdue Loans' }));
   expect(await screen.findByText('Loan #99')).toBeInTheDocument();
   expect(await screen.findByText('Member: Jane Doe')).toBeInTheDocument();
   expect(await screen.findByText('Book: Clean Code')).toBeInTheDocument();
@@ -169,8 +174,8 @@ test('submits borrow form with numeric ids', async () => {
 
 test('returns an active loan when return button clicked', async () => {
   const user = userEvent.setup();
-  fetchLoans.mockResolvedValueOnce([
-    {
+  fetchLoans.mockImplementation((activeOnly = true) => {
+    const loan = {
       id: 7,
       member_id: 1,
       book_id: 1,
@@ -178,18 +183,46 @@ test('returns an active loan when return button clicked', async () => {
       book_title: 'Clean Code',
       due_date: '2026-02-25',
       returned_at: null,
-    },
-  ]);
+    };
+    return Promise.resolve(activeOnly ? [loan] : [loan]);
+  });
 
   render(<HomePage />);
   await user.click(await screen.findByRole('button', { name: 'Circulation' }));
-  await screen.findByText('Loan #7');
+  await screen.findByRole('button', { name: 'Return Book' });
 
   await user.click(screen.getByRole('button', { name: 'Return Book' }));
 
   await waitFor(() => {
     expect(returnBook).toHaveBeenCalledWith(7);
   });
+});
+
+test('displays all loans section in circulation tab', async () => {
+  const user = userEvent.setup();
+  fetchLoans.mockImplementation((activeOnly = true) => {
+    if (activeOnly) {
+      return Promise.resolve([]);
+    }
+    return Promise.resolve([
+      {
+        id: 22,
+        member_id: 1,
+        book_id: 1,
+        member_name: 'Jane Doe',
+        book_title: 'Clean Code',
+        due_date: '2026-03-01',
+        returned_at: '2026-03-02T10:00:00Z',
+      },
+    ]);
+  });
+
+  render(<HomePage />);
+  await user.click(await screen.findByRole('button', { name: 'Circulation' }));
+
+  await user.click(screen.getByRole('button', { name: 'All Loans' }));
+  expect(await screen.findByText('Loan #22')).toBeInTheDocument();
+  expect(await screen.findByText('Status: Returned')).toBeInTheDocument();
 });
 
 test('edits existing book and submits update', async () => {
