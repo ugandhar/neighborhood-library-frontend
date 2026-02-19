@@ -11,6 +11,15 @@ export default function CirculationTab({
   setBorrowForm,
   handleBorrowSubmit,
   handleReturn,
+  activePage,
+  setActivePage,
+  hasMoreActive,
+  allPage,
+  setAllPage,
+  hasMoreAll,
+  overduePage,
+  setOverduePage,
+  hasMoreOverdue,
 }) {
   const [loanTab, setLoanTab] = useState('active');
 
@@ -59,48 +68,69 @@ export default function CirculationTab({
         </section>
 
         {loanTab === 'active' ? (
-          <div className="list">
-            {loans.map((loan) => (
-              <article className="item" key={loan.id}>
-                <div>Loan #{loan.id}</div>
-                <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
-                <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
-                <div className="muted">Due: {loan.due_date}</div>
-                <button disabled={loading} onClick={() => handleReturn(loan.id)} type="button">Return Book</button>
-              </article>
-            ))}
-            {loans.length === 0 ? <p className="muted">No active loans.</p> : null}
-          </div>
+          <>
+            <div className="list">
+              {loans.map((loan) => (
+                <article className="item" key={loan.id}>
+                  <div>Loan #{loan.id}</div>
+                  <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
+                  <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
+                  <div className="muted">Due: {loan.due_date}</div>
+                  <button disabled={loading} onClick={() => handleReturn(loan.id)} type="button">Return Book</button>
+                </article>
+              ))}
+              {loans.length === 0 ? <p className="muted">No active loans.</p> : null}
+            </div>
+            <div className="pagination">
+              <button disabled={loading || activePage === 0} onClick={() => setActivePage(activePage - 1)} type="button">Prev</button>
+              <span className="muted">Page {activePage + 1}</span>
+              <button disabled={loading || !hasMoreActive} onClick={() => setActivePage(activePage + 1)} type="button">Next</button>
+            </div>
+          </>
         ) : null}
 
         {loanTab === 'all' ? (
-          <div className="list">
-            {allLoans.map((loan) => (
-              <article className="item" key={`all-${loan.id}`}>
-                <div>Loan #{loan.id}</div>
-                <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
-                <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
-                <div className="muted">Due: {loan.due_date}</div>
-                <div className="muted">Status: {loan.returned_at ? 'Returned' : 'Active'}</div>
-              </article>
-            ))}
-            {allLoans.length === 0 ? <p className="muted">No loans found.</p> : null}
-          </div>
+          <>
+            <div className="list">
+              {allLoans.map((loan) => (
+                <article className="item" key={`all-${loan.id}`}>
+                  <div>Loan #{loan.id}</div>
+                  <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
+                  <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
+                  <div className="muted">Due: {loan.due_date}</div>
+                  <div className="muted">Status: {loan.returned_at ? 'Returned' : 'Active'}</div>
+                </article>
+              ))}
+              {allLoans.length === 0 ? <p className="muted">No loans found.</p> : null}
+            </div>
+            <div className="pagination">
+              <button disabled={loading || allPage === 0} onClick={() => setAllPage(allPage - 1)} type="button">Prev</button>
+              <span className="muted">Page {allPage + 1}</span>
+              <button disabled={loading || !hasMoreAll} onClick={() => setAllPage(allPage + 1)} type="button">Next</button>
+            </div>
+          </>
         ) : null}
 
         {loanTab === 'overdue' ? (
-          <div className="list">
-            {overdueLoans.map((loan) => (
-              <article className="item overdueItem" key={`overdue-${loan.id}`}>
-                <div>Loan #{loan.id}</div>
-                <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
-                <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
-                <div className="muted">Due: {loan.due_date}</div>
-                <span className="badge warn">Overdue</span>
-              </article>
-            ))}
-            {overdueLoans.length === 0 ? <p className="muted">No overdue loans.</p> : null}
-          </div>
+          <>
+            <div className="list">
+              {overdueLoans.map((loan) => (
+                <article className="item overdueItem" key={`overdue-${loan.id}`}>
+                  <div>Loan #{loan.id}</div>
+                  <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
+                  <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
+                  <div className="muted">Due: {loan.due_date}</div>
+                  <span className="badge warn">Overdue</span>
+                </article>
+              ))}
+              {overdueLoans.length === 0 ? <p className="muted">No overdue loans.</p> : null}
+            </div>
+            <div className="pagination">
+              <button disabled={loading || overduePage === 0} onClick={() => setOverduePage(overduePage - 1)} type="button">Prev</button>
+              <span className="muted">Page {overduePage + 1}</span>
+              <button disabled={loading || !hasMoreOverdue} onClick={() => setOverduePage(overduePage + 1)} type="button">Next</button>
+            </div>
+          </>
         ) : null}
       </div>
     </section>

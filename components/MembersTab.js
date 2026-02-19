@@ -10,6 +10,9 @@ export default function MembersTab({
   saveMemberEdit,
   startMemberEdit,
   cancelMemberEdit,
+  page,
+  setPage,
+  hasNextPage,
 }) {
   return (
     <section className="grid">
@@ -48,6 +51,11 @@ export default function MembersTab({
               )}
             </article>
           ))}
+        </div>
+        <div className="pagination">
+          <button disabled={loading || page === 0} onClick={() => setPage(page - 1)} type="button">Prev</button>
+          <span className="muted">Page {page + 1}</span>
+          <button disabled={loading || !hasNextPage} onClick={() => setPage(page + 1)} type="button">Next</button>
         </div>
       </div>
     </section>

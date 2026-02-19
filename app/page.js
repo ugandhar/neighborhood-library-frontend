@@ -21,6 +21,7 @@ import MembersTab from '../components/MembersTab';
 
 const emptyBook = { title: '', author: '', isbn: '', total_copies: 1 };
 const emptyMember = { name: '', email: '', phone: '' };
+const PAGE_SIZE = 5;
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('books');
@@ -44,6 +45,16 @@ export default function HomePage() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [booksPage, setBooksPage] = useState(0);
+  const [membersPage, setMembersPage] = useState(0);
+  const [activeLoansPage, setActiveLoansPage] = useState(0);
+  const [allLoansPage, setAllLoansPage] = useState(0);
+  const [overdueLoansPage, setOverdueLoansPage] = useState(0);
+  const [hasMoreBooks, setHasMoreBooks] = useState(false);
+  const [hasMoreMembers, setHasMoreMembers] = useState(false);
+  const [hasMoreActiveLoans, setHasMoreActiveLoans] = useState(false);
+  const [hasMoreAllLoans, setHasMoreAllLoans] = useState(false);
+  const [hasMoreOverdueLoans, setHasMoreOverdueLoans] = useState(false);
 
   const hasData = useMemo(
     () =>
@@ -57,22 +68,27 @@ export default function HomePage() {
 
   async function loadAll() {
     const [bookData, memberData, activeLoanData, allLoanData, overdueLoanData] = await Promise.all([
-      fetchBooks(),
-      fetchMembers(),
-      fetchLoans(true),
-      fetchLoans(false),
-      fetchOverdueLoans(),
+      fetchBooks(booksPage * PAGE_SIZE, PAGE_SIZE),
+      fetchMembers(membersPage * PAGE_SIZE, PAGE_SIZE),
+      fetchLoans(true, activeLoansPage * PAGE_SIZE, PAGE_SIZE),
+      fetchLoans(false, allLoansPage * PAGE_SIZE, PAGE_SIZE),
+      fetchOverdueLoans(null, overdueLoansPage * PAGE_SIZE, PAGE_SIZE),
     ]);
     setBooks(bookData);
     setMembers(memberData);
     setLoans(activeLoanData);
     setAllLoans(allLoanData);
     setOverdueLoans(overdueLoanData);
+    setHasMoreBooks(bookData.length === PAGE_SIZE);
+    setHasMoreMembers(memberData.length === PAGE_SIZE);
+    setHasMoreActiveLoans(activeLoanData.length === PAGE_SIZE);
+    setHasMoreAllLoans(allLoanData.length === PAGE_SIZE);
+    setHasMoreOverdueLoans(overdueLoanData.length === PAGE_SIZE);
   }
 
   useEffect(() => {
     loadAll().catch((err) => setError(err.message));
-  }, []);
+  }, [booksPage, membersPage, activeLoansPage, allLoansPage, overdueLoansPage]);
 
   async function handleBookSubmit(event) {
     event.preventDefault();
@@ -267,6 +283,9 @@ export default function HomePage() {
           saveBookEdit={saveBookEdit}
           startBookEdit={startBookEdit}
           cancelBookEdit={() => setEditingBookId(null)}
+          page={booksPage}
+          setPage={setBooksPage}
+          hasNextPage={hasMoreBooks}
         />
       ) : null}
 
@@ -283,6 +302,9 @@ export default function HomePage() {
           saveMemberEdit={saveMemberEdit}
           startMemberEdit={startMemberEdit}
           cancelMemberEdit={() => setEditingMemberId(null)}
+          page={membersPage}
+          setPage={setMembersPage}
+          hasNextPage={hasMoreMembers}
         />
       ) : null}
 
@@ -298,6 +320,15 @@ export default function HomePage() {
           setBorrowForm={setBorrowForm}
           handleBorrowSubmit={handleBorrowSubmit}
           handleReturn={handleReturn}
+          activePage={activeLoansPage}
+          setActivePage={setActiveLoansPage}
+          hasMoreActive={hasMoreActiveLoans}
+          allPage={allLoansPage}
+          setAllPage={setAllLoansPage}
+          hasMoreAll={hasMoreAllLoans}
+          overduePage={overdueLoansPage}
+          setOverduePage={setOverdueLoansPage}
+          hasMoreOverdue={hasMoreOverdueLoans}
         />
       ) : null}
 
