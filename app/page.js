@@ -7,6 +7,7 @@ import {
   createMember,
   fetchBooks,
   fetchLoans,
+  fetchOverdueLoans,
   fetchMemberBorrowedBooks,
   fetchMembers,
   returnBook,
@@ -27,6 +28,7 @@ export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [members, setMembers] = useState([]);
   const [loans, setLoans] = useState([]);
+  const [overdueLoans, setOverdueLoans] = useState([]);
   const [memberLoans, setMemberLoans] = useState([]);
   const [selectedMemberForLoans, setSelectedMemberForLoans] = useState('');
 
@@ -43,19 +45,21 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
 
   const hasData = useMemo(
-    () => books.length > 0 || members.length > 0 || loans.length > 0,
-    [books, members, loans]
+    () => books.length > 0 || members.length > 0 || loans.length > 0 || overdueLoans.length > 0,
+    [books, members, loans, overdueLoans]
   );
 
   async function loadAll() {
-    const [bookData, memberData, loanData] = await Promise.all([
+    const [bookData, memberData, loanData, overdueLoanData] = await Promise.all([
       fetchBooks(),
       fetchMembers(),
       fetchLoans(true),
+      fetchOverdueLoans(),
     ]);
     setBooks(bookData);
     setMembers(memberData);
     setLoans(loanData);
+    setOverdueLoans(overdueLoanData);
   }
 
   useEffect(() => {
@@ -279,6 +283,7 @@ export default function HomePage() {
           books={books}
           members={members}
           loans={loans}
+          overdueLoans={overdueLoans}
           loading={loading}
           borrowForm={borrowForm}
           setBorrowForm={setBorrowForm}

@@ -2,6 +2,7 @@ export default function CirculationTab({
   books,
   members,
   loans,
+  overdueLoans,
   loading,
   borrowForm,
   setBorrowForm,
@@ -40,6 +41,19 @@ export default function CirculationTab({
             </article>
           ))}
           {loans.length === 0 ? <p className="muted">No active loans.</p> : null}
+        </div>
+
+        <h2 className="panelSubTitle">Overdue Loans</h2>
+        <div className="list">
+          {overdueLoans.map((loan) => (
+            <article className="item" key={`overdue-${loan.id}`}>
+              <div>Loan #{loan.id}</div>
+              <div className="muted">Member ID: {loan.member_id}</div>
+              <div className="muted">Book ID: {loan.book_id}</div>
+              <div className="muted">Due: {loan.due_date}</div>
+            </article>
+          ))}
+          {overdueLoans.length === 0 ? <p className="muted">No overdue loans.</p> : null}
         </div>
       </div>
     </section>

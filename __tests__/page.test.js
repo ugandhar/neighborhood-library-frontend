@@ -8,6 +8,7 @@ import {
   createMember,
   fetchBooks,
   fetchLoans,
+  fetchOverdueLoans,
   fetchMemberBorrowedBooks,
   fetchMembers,
   returnBook,
@@ -25,6 +26,7 @@ jest.mock('../lib/api', () => ({
   borrowBook: jest.fn(),
   returnBook: jest.fn(),
   fetchLoans: jest.fn(),
+  fetchOverdueLoans: jest.fn(),
   fetchMemberBorrowedBooks: jest.fn(),
 }));
 
@@ -38,6 +40,7 @@ beforeEach(() => {
     { id: 1, name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890' },
   ]);
   fetchLoans.mockResolvedValue([]);
+  fetchOverdueLoans.mockResolvedValue([]);
 
   createBook.mockResolvedValue({ id: 2 });
   createMember.mockResolvedValue({ id: 2 });
@@ -103,4 +106,17 @@ test('loads member borrowed books for selected member', async () => {
   await waitFor(() => {
     expect(fetchMemberBorrowedBooks).toHaveBeenCalledWith(1);
   });
+});
+
+test('displays overdue loans in circulation tab', async () => {
+  const user = userEvent.setup();
+  fetchOverdueLoans.mockResolvedValueOnce([
+    { id: 99, member_id: 1, book_id: 1, due_date: '2026-02-01' },
+  ]);
+
+  render(<HomePage />);
+  await user.click(await screen.findByRole('button', { name: 'Circulation' }));
+
+  expect(await screen.findByText('Overdue Loans')).toBeInTheDocument();
+  expect(await screen.findByText('Loan #99')).toBeInTheDocument();
 });
