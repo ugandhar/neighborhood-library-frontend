@@ -9,14 +9,6 @@ export default function CirculationTab({
   handleBorrowSubmit,
   handleReturn,
 }) {
-  function memberNameById(memberId) {
-    return members.find((member) => member.id === memberId)?.name || `Unknown member (${memberId})`;
-  }
-
-  function bookTitleById(bookId) {
-    return books.find((book) => book.id === bookId)?.title || `Unknown book (${bookId})`;
-  }
-
   return (
     <section className="grid">
       <div className="panel">
@@ -42,8 +34,8 @@ export default function CirculationTab({
           {loans.map((loan) => (
             <article className="item" key={loan.id}>
               <div>Loan #{loan.id}</div>
-              <div className="muted">Member: {memberNameById(loan.member_id)}</div>
-              <div className="muted">Book: {bookTitleById(loan.book_id)}</div>
+              <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
+              <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
               <div className="muted">Due: {loan.due_date}</div>
               <button disabled={loading} onClick={() => handleReturn(loan.id)} type="button">Return Book</button>
             </article>
@@ -56,8 +48,8 @@ export default function CirculationTab({
           {overdueLoans.map((loan) => (
             <article className="item overdueItem" key={`overdue-${loan.id}`}>
               <div>Loan #{loan.id}</div>
-              <div className="muted">Member: {memberNameById(loan.member_id)}</div>
-              <div className="muted">Book: {bookTitleById(loan.book_id)}</div>
+              <div className="muted">Member: {loan.member_name || `Member #${loan.member_id}`}</div>
+              <div className="muted">Book: {loan.book_title || `Book #${loan.book_id}`}</div>
               <div className="muted">Due: {loan.due_date}</div>
               <span className="badge warn">Overdue</span>
             </article>
