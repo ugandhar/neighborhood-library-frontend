@@ -1,6 +1,6 @@
 # Neighborhood Library Frontend
 
-Minimal Next.js frontend for the Neighborhood Library backend.
+Next.js frontend for the Neighborhood Library backend.
 
 ## Prerequisites
 
