@@ -2,12 +2,13 @@
 
 Minimal Next.js frontend for the Neighborhood Library backend.
 
-## Run Frontend Server (frontend repo)
+## Clone And Run
 
-From the frontend repo:
+Clone the frontend repository and start server:
 
 ```bash
-cd /Users/swethareddy/projects/neighborhood-library-frontend
+git clone git@github.com:ugandhar/neighborhood-library-frontend.git
+cd neighborhood-library-frontend
 cp .env.example .env.local
 npm install
 npm run dev
@@ -17,14 +18,16 @@ App runs at `http://localhost:3000`.
 
 ## Run with Backend
 
-Start backend first from `/Users/swethareddy/projects/Library/backend`:
+Start backend first from cloned backend repo:
 
 ```bash
+git clone git@github.com:ugandhar/Library.git
+cd Library/backend
 docker compose up -d db
 python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Then start frontend from `/Users/swethareddy/projects/neighborhood-library-frontend`:
+Then start frontend from `neighborhood-library-frontend`:
 
 ```bash
 npm run dev
@@ -35,7 +38,7 @@ npm run dev
 From frontend repo:
 
 ```bash
-cd /Users/swethareddy/projects/neighborhood-library-frontend
+cd neighborhood-library-frontend
 npm test -- --runInBand
 ```
 
