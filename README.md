@@ -2,6 +2,23 @@
 
 Minimal Next.js frontend for the Neighborhood Library backend.
 
+## Prerequisites
+
+- Node.js 18+ and `npm`
+
+Install via Homebrew:
+
+```bash
+brew install node
+```
+
+Verify:
+
+```bash
+node --version
+npm --version
+```
+
 ## Clone And Run
 
 Clone the frontend repository and start server:
